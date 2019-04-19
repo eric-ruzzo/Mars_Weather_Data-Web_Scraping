@@ -41,14 +41,19 @@ def scrape():
     browser.visit(url)
 
     # Find featured image
-    featured_img = browser.find_by_css("a.button").first.click()
+    featured_img = browser.find_by_css("article.carousel_item").first
 
-    # Navigate to full-size image
-    featured_img = browser.find_link_by_text("more info     ").click()
+    # Set base url to concatenate with image url
+    base_url = "https://www.jpl.nasa.gov"
 
-    # Save link to full size image as a variable
-    full_size = browser.find_by_css("img.main_image")
-    featured_image_url = full_size["src"]
+    # Select image reference from featured_img
+    featured_image_url = featured_img["style"]
+
+    # Split with " delimiter to remove extra text
+    featured_image_url = featured_image_url.split('"')[1]
+
+    # Concatenate with base url to get full url
+    featured_image_url = "f{base_url}{featured_image_url}"
 
     # Quit browser session
     browser.quit()
@@ -113,11 +118,20 @@ def scrape():
         title = title.replace(" thumbnail", "")
         titles.append(title)
 
-    # Zip title and links list to create dictionary
-    hemisphere_image_urls = dict(zip(titles, links))
+    # Create empty list to store dictionaries for each title and url
+    hemisphere_image_urls = []
+
+    # Loop through links and titles and add dictionaries to list
+    for item in range(len(links)):
+        hemisphere_image_urls.append({"title": titles[item], "url": links[item]})
+
+    # Create dictionary for all Mars data
+    mars_dict = {"headline": news_title, "subhead": news_p, "featured": featured_image_url, "weather": mars_weather, "table": tables, "hemispheres": hemisphere_image_urls}
 
     # Return results in a single dictionary
-    return {"headline": new_title, "subhead": news_p, "featured": featured_image_url, "weather": mars_weather, "table": tables, "hemispheres": hemisphere_image_urls}
+    return print(mars_dict)
+
+
 
 if __name__=="__main__":
-    print()
+    scrape()
