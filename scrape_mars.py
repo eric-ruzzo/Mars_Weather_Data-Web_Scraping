@@ -4,11 +4,9 @@ from bs4 import BeautifulSoup as bs
 import pandas as pd
 import requests
 from splinter import Browser
-from flask import Flask
 
-app = Flask(__name__)
 
-def scrape():
+def scrape_info():
     # Save url as a variable
 
     url = "https://mars.nasa.gov/news/"
@@ -130,8 +128,3 @@ def scrape():
 
     # Return results in a single dictionary
     return print(mars_dict)
-
-
-
-if __name__=="__main__":
-    scrape()
