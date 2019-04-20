@@ -1,5 +1,4 @@
 # Import Dependencies
-
 from bs4 import BeautifulSoup as bs
 import pandas as pd
 import requests
@@ -7,16 +6,21 @@ from splinter import Browser
 
 
 def scrape_info():
+    # Set executable path and browser for splinter
+    executable_path = {'executable_path': 'chromedriver.exe'}
+    browser = Browser('chrome', **executable_path, headless=False)
+
     # Save url as a variable
-
     url = "https://mars.nasa.gov/news/"
-    # Retrieve page with requests
 
-    response = requests.get(url)
+    # Visit url using splinter
+    browser.visit(url)
+
+    # Save browser contents in html as variable
+    page = browser.html
 
     # Create and parse BeautifulSoup object
-
-    soup = bs(response.text, "html.parser")
+    soup = bs(page, "html.parser")
 
     # Collect latest news title
     news_title = soup.find("div", class_="content_title").text
@@ -29,10 +33,6 @@ def scrape_info():
 
     #Strip whitespace
     news_p = news_p.strip()
-
-    # Set executable path and browser for splinter
-    executable_path = {'executable_path': 'chromedriver.exe'}
-    browser = Browser('chrome', **executable_path, headless=False)
 
     # Visit url using splinter
     url = "https://www.jpl.nasa.gov/spaceimages/?search=&category=Mars"
@@ -51,19 +51,19 @@ def scrape_info():
     featured_image_url = featured_image_url.split('"')[1]
 
     # Concatenate with base url to get full url
-    featured_image_url = "f{base_url}{featured_image_url}"
-
-    # Quit browser session
-    browser.quit()
+    featured_image_url = f"{base_url}{featured_image_url}"
 
     # Save url as a variable
     url = "https://twitter.com/marswxreport?lang=en"
 
-    # Retrieve page with requests
-    response = requests.get(url)
+    # Visit url using splinter
+    browser.visit(url)
+
+    # Save html contents as a variable
+    page = browser.html
 
     # Create and parse BeautifulSoup object
-    soup = bs(response.text, "html.parser")
+    soup = bs(page, "html.parser")
 
     # Find latest mars weather and save as a variable
     # Link text needs to be removed, so do not include .text in find
@@ -79,19 +79,28 @@ def scrape_info():
     mars_weather = mars_weather.text
     mars_weather = mars_weather.replace("\n", " ")
 
+    # Quit browser session
+    browser.quit()
+
     # Use pandas to scrape Mars facts website
     url = "https://space-facts.com/mars/"
-    tables = pd.read_html(url)
+    tables = pd.read_html(url)[0]
+
+    # Format dataframe
+    tables = tables.rename(columns = {0: "Description", 1: "Value"})
+    tables = tables.set_index("Description")
+
+    # Convert to html
+    html_table = tables.to_html()
+    html_table
 
     # Save url as a variable
-
     url = "https://astrogeology.usgs.gov/search/results?q=hemisphere+enhanced&k1=target&v1=Mars"
+    
     # Retrieve page with requests
-
     response = requests.get(url)
 
     # Create and parse BeautifulSoup object
-
     soup = bs(response.text, "html.parser")
 
     # Find all divs containing hemisphere image links
@@ -113,7 +122,7 @@ def scrape_info():
     for item in link_list:
         title = item.find("img")
         title = title["alt"]
-        title = title.replace(" thumbnail", "")
+        title = title.replace(" Enhanced thumbnail", "")
         titles.append(title)
 
     # Create empty list to store dictionaries for each title and url
@@ -124,7 +133,7 @@ def scrape_info():
         hemisphere_image_urls.append({"title": titles[item], "url": links[item]})
 
     # Create dictionary for all Mars data
-    mars_dict = {"headline": news_title, "subhead": news_p, "featured": featured_image_url, "weather": mars_weather, "table": tables, "hemispheres": hemisphere_image_urls}
+    mars_data = {"headline": news_title, "subhead": news_p, "featured": featured_image_url, "weather": mars_weather, "table": html_table, "hemispheres": hemisphere_image_urls}
 
     # Return results in a single dictionary
-    return print(mars_dict)
+    return mars_data
