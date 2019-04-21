@@ -15,7 +15,7 @@ def home():
     mars_info = mongo.db.collection.find_one()
 
     # Return template and data
-    return render_template("index.html", mars=mars_info)
+    return render_template("index.html", mars_info=mars_info)
 
 
 # Create route
@@ -26,7 +26,7 @@ def scrape():
     mars_data = scrape_mars.scrape_info()
 
     # Update the Mongo database
-    mongo.db.mars_info.update({}, mars_data, upsert=True)
+    mongo.db.collection.update({}, mars_data, upsert=True)
 
     # Redirect back to home page
     return redirect("/")

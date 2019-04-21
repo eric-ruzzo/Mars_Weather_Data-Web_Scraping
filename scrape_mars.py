@@ -107,13 +107,13 @@ def scrape_info():
     link_list = soup.find_all("a", class_="itemLink")
 
     # Set base url used to create links
-    base_url = "https://astrogeology.usgs.gov"
+    base_url = "https://astropedia.astrogeology.usgs.gov/download"
 
     # Extract links from divs
-    cerberus = f"{base_url}{link_list[0]['href']}"
-    schiaparelli = f"{base_url}{link_list[1]['href']}"
-    syrtis = f"{base_url}{link_list[2]['href']}"
-    valles = f"{base_url}{link_list[3]['href']}"
+    cerberus = f"{base_url}{link_list[0]['href'].replace('/search/map', '')}.tif/full.jpg"
+    schiaparelli = f"{base_url}{link_list[1]['href'].replace('/search/map', '')}.tif/full.jpg"
+    syrtis = f"{base_url}{link_list[2]['href'].replace('/search/map', '')}.tif/full.jpg"
+    valles = f"{base_url}{link_list[3]['href'].replace('/search/map', '')}.tif/full.jpg"
 
     links = [cerberus, schiaparelli, syrtis, valles]
     titles = []
