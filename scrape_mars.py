@@ -84,7 +84,7 @@ def scrape_info():
 
     # Use pandas to scrape Mars facts website
     url = "https://space-facts.com/mars/"
-    tables = pd.read_html(url)[0]
+    tables = pd.read_html(url)[1]
 
     # Format dataframe
     tables = tables.rename(columns = {0: "Description", 1: "Value"})
