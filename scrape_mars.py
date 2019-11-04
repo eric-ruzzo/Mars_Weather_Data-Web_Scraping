@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup as bs
 import pandas as pd
 import requests
 from splinter import Browser
+import time
 
 
 def scrape_info():
@@ -15,6 +16,9 @@ def scrape_info():
 
     # Visit url using splinter
     browser.visit(url)
+
+    # Use sleep function in time module to wait for page to fully load
+    time.sleep(10)
 
     # Save browser contents in html as variable
     page = browser.html
